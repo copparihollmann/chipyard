@@ -327,13 +327,20 @@ class FireSimLeanGemminiRocketMMIOOnlyConfig extends Config(
   new WithFireSimConfigTweaks ++
   new chipyard.LeanGemminiRocketConfig)
 
-class FireSimRadianceClusterSynConfig extends Config(
-  new chipyard.harness.WithHarnessBinderClockFreqMHz(500.0) ++
-  new chipyard.config.WithNoTraceIO ++
+// NOTE: RadianceClusterSynConfig was renamed to RadianceClusterConfig in newer radiance
+// class FireSimRadianceClusterSynConfig extends Config(
+//   new chipyard.harness.WithHarnessBinderClockFreqMHz(500.0) ++
+//   new chipyard.config.WithNoTraceIO ++
+//   new WithDefaultFireSimBridges ++
+//   new chipyard.config.WithRadBootROM ++
+//   new WithFireSimConfigTweaks ++
+//   new chipyard.RadianceClusterSynConfig)
+
+// MX Gemmini on Rocket — standalone RoCC accelerator, no Radiance GPU cluster.
+class FireSimMxGemminiRocketConfig extends Config(
   new WithDefaultFireSimBridges ++
-  new chipyard.config.WithRadBootROM ++
   new WithFireSimConfigTweaks ++
-  new chipyard.RadianceClusterSynConfig)
+  new chipyard.MxGemminiRocketConfig)
 
 class FireSimLargeBoomCospikeConfig extends Config(
   new WithCospikeBridge ++
