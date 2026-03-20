@@ -7,19 +7,19 @@ import java.io.File
 import chisel3._
 import chisel3.util.{log2Up}
 
-import org.chipsalliance.cde.config.{Config}
+import org.chipsalliance.cde.config.Config
 import freechips.rocketchip.tile._
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.devices.tilelink.{BootROMLocated}
 import freechips.rocketchip.devices.debug.{DebugModuleKey}
-import freechips.rocketchip.diplomacy.{AddressSet}
 import freechips.rocketchip.prci.{AsynchronousCrossing}
 import testchipip.cosim.{TracePortKey}
 import icenet._
 
 import chipyard.clocking.{ChipyardPRCIControlKey}
 import chipyard.harness.{HarnessClockInstantiatorKey}
+import saturn.common.{VectorParams}
 
 // Disables clock-gating; doesn't play nice with our FAME-1 pass
 class WithoutClockGating extends Config((site, here, up) => {
@@ -354,11 +354,42 @@ class FireSimLargeBoomSV39CospikeConfig extends Config(
   new freechips.rocketchip.rocket.WithSV39 ++
   new chipyard.LargeBoomV3Config)
 
-class CTCFireSimConfig extends Config(
-  new WithCTCBridge ++
-  new testchipip.ctc.WithCTC(Seq(new testchipip.ctc.CTCParams(onchipAddr = 0x1000000000L, offchipAddr = 0x0L, size = ((1L << 32) - 1), noPhy=true))) ++ 
-  new chipyard.iobinders.WithCTCPunchthrough ++ 
-  new FireSimRocketConfig
+// Adding Saturn Config:
+
+class FireSimSaturnGENV256D128ShuttleConfig extends Config(
+  new WithDefaultFireSimBridges ++
+  new WithFireSimConfigTweaks ++
+  new chipyard.GENV256D128ShuttleConfig
 )
 
+class FireSimREFV128DoubleRocketConfig extends Config(
+  new WithDefaultFireSimBridges ++
+  new WithFireSimConfigTweaks ++
+  new saturn.rocket.WithRocketVectorUnit(128, 64, VectorParams.opuParams) ++
+  new chipyard.config.WithSystemBusWidth(64) ++
+  new freechips.rocketchip.rocket.WithNHugeCores(2) ++
+  new chipyard.config.AbstractConfig
+)
 
+class REFV256DoubleRocketConfig extends Config(
+  new saturn.rocket.WithRocketVectorUnit(256, 128, VectorParams.refParams) ++
+  new chipyard.config.WithSystemBusWidth(128) ++
+  new freechips.rocketchip.rocket.WithNHugeCores(2) ++
+  new chipyard.config.AbstractConfig)
+class REFV512DoubleRocketConfig extends Config(
+  new saturn.rocket.WithRocketVectorUnit(512, 256, VectorParams.refParams) ++
+  new chipyard.config.WithSystemBusWidth(256) ++
+  new freechips.rocketchip.rocket.WithNHugeCores(2) ++
+  new chipyard.config.AbstractConfig)
+
+//class FireSimOPUMXV256D128ShuttleConfig extends Config(
+//  new WithDefaultFireSimBridges ++
+//  new WithFireSimConfigTweaks ++
+//  new chipyard.OPUMXV256D128ShuttleConfig
+//)
+
+class FireSimOPUV128D64ShuttleConfig extends Config(
+  new WithDefaultFireSimBridges ++
+  new WithFireSimConfigTweaks ++
+  new chipyard.OPUV128D64ShuttleConfig
+)
