@@ -30,3 +30,9 @@ project/project/
 .classpath_cache/
 .vscode/
 tests/build/
+
+# autocomp MX-Gemmini experiment artifacts (machine-local)
+.autocomp-spend.jsonl
+.autocomp-spend_total.json
+mx-autocomp-bundle.tar.gz
+*.pdf
