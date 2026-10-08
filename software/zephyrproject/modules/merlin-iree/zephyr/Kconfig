@@ -1,0 +1,63 @@
+# SPDX-License-Identifier: Apache-2.0
+#
+# Zephyr Kconfig for the Merlin / IREE static-runtime module.
+#
+# The IREE runtime is cross-compiled separately by `./merlin build --profile
+# zephyr` and installed under $MERLIN_ROOT/build/zephyr-vanilla-release/install.
+# IREE itself is built with IREE_PLATFORM_GENERIC -- no fork of IREE's
+# platform layer. Multi-hart parallelism is the app's responsibility (spawn
+# multiple k_threads, each with its own iree_vm_context) rather than IREE's
+# internal task pool.
+
+menuconfig MERLIN_IREE
+	bool "Merlin / IREE runtime"
+	depends on RISCV
+	depends on FPU
+	help
+	  Link the Merlin/IREE runtime (cross-compiled by
+	  `merlin build --profile zephyr`) into the application. Provides the
+	  iree_vm_*, iree_hal_*, and iree_modules_* APIs needed to load and
+	  invoke .vmfb bytecode modules produced by `merlin compile`.
+
+	  IREE is built with IREE_PLATFORM_GENERIC: a single-threaded inline
+	  executor with no synchronization primitives. To exploit multiple
+	  harts, the application creates one iree_vm_context per worker
+	  k_thread (see samples/merlin/model_benchmark/src/main.c).
+
+if MERLIN_IREE
+
+config MERLIN_IREE_INSTALL_DIR
+	string "Path to the Merlin/IREE install directory"
+	default "$(MERLIN_ROOT)/build/zephyr-vanilla-release/install"
+	help
+	  Absolute path to the install tree produced by
+	  `./merlin build --profile zephyr`. Must contain {lib,include}/iree_*.
+	  May also be overridden at configure time via -DMERLIN_INSTALL_DIR=...
+
+config MERLIN_IREE_NUM_WORKERS
+	int "Number of app-level IREE workers (one k_thread per worker)"
+	default MP_MAX_NUM_CPUS if SMP
+	default 1
+	range 1 16
+	help
+	  How many k_thread workers the application spawns, each driving its
+	  own iree_vm_context on a private slice of the input batch. Defaults
+	  to CONFIG_MP_MAX_NUM_CPUS so each hart gets one worker. Set to 1 to
+	  disable app-level parallelism (single-thread inline execution).
+
+config MERLIN_IREE_HEAP_SIZE
+	int "IREE arena heap floor (bytes)"
+	default 67108864
+	help
+	  Lower bound for the system heap used by IREE arenas (allocated through
+	  iree_allocator_system / malloc). Larger models need more; the sample's
+	  prj.conf sets CONFIG_HEAP_MEM_POOL_SIZE accordingly.
+
+config MERLIN_IREE_DEBUG_LOGGING
+	bool "Enable IREE debug logging on console"
+	default n
+	help
+	  Compile IREE with verbose runtime tracing. Off by default to keep
+	  the FireSim uartlog clean during paper-grade timing measurements.
+
+endif # MERLIN_IREE
