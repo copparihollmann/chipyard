@@ -411,4 +411,17 @@ class FireSimKodiakVME1CoreConfig extends Config(
   new WithFireSimKodiakVME500ConfigTweaks ++
   new chipyard.KodiakVME1CoreConfig)
 
+// Keep VLEN=512 and the Zvt64t instruction contract while reducing the physical
+// VME sub-tile from DLEN/8=32 to DLEN/8=16 elements for U250 area exploration.
+// This is a separate hardware identity; the validated 512/256 target remains above.
+class KodiakVMECompact1CoreConfig extends Config(
+  new chipyard.WithKodiakVMEEICGPassthrough ++
+  new saturn.shuttle.WithShuttleVectorUnit(512, 128, saturn.common.VectorParams.opuMxParams) ++
+  new chipyard.WithKodiakBase(nShuttleCores = 1))
+
+class FireSimKodiakVMECompact1CoreConfig extends Config(
+  new WithDefaultFireSimBridges ++
+  new WithFireSimKodiakVME500ConfigTweaks ++
+  new KodiakVMECompact1CoreConfig)
+
 
