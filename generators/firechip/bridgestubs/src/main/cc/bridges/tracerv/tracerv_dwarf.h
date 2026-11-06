@@ -37,7 +37,7 @@ public:
   dwarf_t(int);
   virtual ~dwarf_t(void) {
     if (this->dbg) {
-      dwarf_finish(this->dbg);
+      dwarf_finish(this->dbg, nullptr);
     }
   }
 

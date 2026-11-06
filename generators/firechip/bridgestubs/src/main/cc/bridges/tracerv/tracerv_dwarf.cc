@@ -43,7 +43,7 @@ private:
 
 dwarf_t::dwarf_t(int fd) {
   Dwarf_Error err;
-  if (dwarf_init_b(fd, DW_GROUPNUMBER_ANY, &dwarf_runtime_error, nullptr, &this->dbg, &err) !=
+  if (dwarf_init_b(fd, DW_DLC_READ, DW_GROUPNUMBER_ANY, &dwarf_runtime_error, nullptr, &this->dbg, &err) !=
       DW_DLV_OK) {
     this->dbg = nullptr;
   }
