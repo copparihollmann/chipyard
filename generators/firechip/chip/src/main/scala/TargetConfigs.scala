@@ -393,4 +393,22 @@ class CTCFireSimConfig extends Config(
   new FireSimRocketConfig
 )
 
+// Kodiak's one-core VME target is intentionally distinct from the legacy BME OPU target.
+// Keep the 500 MHz bus model used by Kodiak's FireSim integration, while retaining the
+// shared FireSim memory-size adjustment and bridges. This config requires Saturn's
+// exact VME pin and Rocket's Matrix decoder pin (see the task's source-pin receipt).
+class WithFireSimKodiakVME500ConfigTweaks extends Config(
+  new chipyard.config.WithSystemBusFrequency(500.0) ++
+  new chipyard.config.WithControlBusFrequency(500.0) ++
+  new chipyard.config.WithPeripheryBusFrequency(500.0) ++
+  new chipyard.config.WithMemoryBusFrequency(500.0) ++
+  new chipyard.config.WithFrontBusFrequency(500.0) ++
+  new WithFireSimDesignTweaks
+)
+
+class FireSimKodiakVME1CoreConfig extends Config(
+  new WithDefaultFireSimBridges ++
+  new WithFireSimKodiakVME500ConfigTweaks ++
+  new chipyard.KodiakVME1CoreConfig)
+
 
