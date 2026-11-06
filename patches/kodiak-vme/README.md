@@ -32,6 +32,12 @@ The VLEN512/DLEN256 VME target failed U250 `place_design` utilization checks: 2,
 
 The compact U250 synthesis/implementation and FPGA workload remain separate gates. Use a new HWDB identity and a driver built for the compact configuration if a bitstream passes. Do not reuse the VLEN512/DLEN256 driver or an OPU HWDB entry.
 
+### Signed int8 model contract
+
+The `xsfmm64t` integer path sign-extends both 8-bit operands before each multiplication and accumulates in a wrapping 32-bit cell, matching an `i8 × i8 → i32` contraction, including the representable endpoints −128 and 127. The kernel ABI takes K-major packed A and B, writes row-major int32 C, and accepts an optional int32 per-output-channel bias. Merlin's current matrix shim passes a null bias pointer; a torchAO graph's int32-to-float conversion, per-row activation scale, per-channel weight scale, and float bias therefore belong in the surrounding graph. Its explicit quantization range and rounding must be preserved there, without another quantization pass in the matrix kernel.
+
+VLEN512 gives a 64 × 64 logical tile; DLEN128 gives a 16 × 16 physical cell array, time-multiplexed across each logical tile. The kernel sets the final `sf.msettk` value for a K remainder after four-element chunks. The 35 × 63 × 33 biased test proves the signed K-tail and one partial tile with operand values in [−8, 8]. It does not exercise −128/127, the full 128 × 128 two-by-two-tile fast path, a torchAO model's scale/bias graph, or model-to-VME lowering. Those require separate tests before a W8A8 model claim.
+
 ### Measuring compact VME array use
 
 The compact unit has 16 × 16 = 256 physical int8 MAC cells. Count a cell update only when its `io.macc && io.row_en(i) && io.col_en(j)` is true in `OuterProductUnit`; the sequencer qualifies `io.macc` with a fired, nonempty matrix instruction. Sum those 256 cell enables each cycle into a 64-bit `enabled_cell_cycles` counter. Also count `matrix_active_cycles` when at least one matrix MAC is issued and `roi_cycles` between explicit worker start/end markers on Shuttle hart 0. Read the counters at both markers and use their differences.
