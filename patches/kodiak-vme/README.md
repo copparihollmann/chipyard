@@ -23,3 +23,11 @@ The Iris FireSim gitlink is `e1bdea8bb042b900995436ecc3d7c44100eb9da0`. Its sbt-
 ```
 
 The patch SHA-256 is `36a72ab105a650af30c456a3a8478da2765bac7bc3a5248e2e6e4279b0ceec77`. It only removes docs publishing plugin wiring in `sim/build.sbt` and `sim/project/plugins.sbt`; it does not change target or MIDAS logic. Keep the Chipyard FireSim gitlink at the public Iris pin. With this patch, Golden Gate U250 `verilog`, Verilator metasim build, and a 35×63×33 biased K-tail ELF run passed. FireSim metasim reported the same digest `0x15d98143c9a17f64`, zero mismatches and guard failures, and `KT DONE` (2,761 kernel target cycles); a SHA-bound receipt is in the managed task. Vivado bitstream generation and FPGA execution are separate gates.
+
+## Experimental compact U250 candidate
+
+`KodiakVMECompact1CoreConfig` and `FireSimKodiakVMECompact1CoreConfig` keep VLEN512 and the `xsfmm64t` Zvt instruction contract while reducing DLEN from 256 to 128. The physical int8 matrix array is 16×16 (256 MAC cells) instead of 32×32 (1,024 cells). This is a distinct hardware configuration and remains **experimental until U250 implementation fits, meets timing, and produces a tested bitstream**. It does not alter the current BME OPU ASIC or bitstream.
+
+The VLEN512/DLEN256 VME target failed U250 `place_design` utilization checks: 2,208,803 slice LUTs required versus 1,728,000 available. The compact target passed JDK17/Espresso Firechip compilation, forced FIRRTL generation, direct SerialTL Verilator execution, Golden Gate U250 generation, FireSim Verilator build, and exact ELF metasim. The same 35×63×33 biased K-tail ELF produced digest `0x15d98143c9a17f64`, zero mismatch and guard fields, and `KT DONE` in both compact RTL and metasim. The compact RTL and metasim kernel intervals were 2,695 and 3,264 target cycles, respectively. These cycle counts are functional test observations; hardware utilization requires issued-work and available-cell counters over a defined interval and cannot be inferred from speedup alone.
+
+The compact U250 synthesis/implementation and FPGA workload remain separate gates. Use a new HWDB identity and a driver built for the compact configuration if a bitstream passes. Do not reuse the VLEN512/DLEN256 driver or an OPU HWDB entry.
