@@ -13,3 +13,13 @@ Apply it to an **editable task-managed Rocket sibling** at the exact public base
 The script rejects a different HEAD, changed patch bytes, or a dirty tracked worktree. It leaves a visible uncommitted diff in the task-managed Rocket sibling; do not commit a symlink overlay as a Chipyard gitlink. This patch is needed only for configurations with a scalar Rocket. The vector Rocket path remains the same.
 
 Validation on the source graph used to produce this patch: Firechip source compilation and bounded FireSim FIRRTL generation passed. A standalone Kodiak VME Verilator simulator executed a fresh 35×63×33 biased K-tail ELF on Shuttle hart 0 through direct SerialTL. Pinned Zvt Spike and RTL reported the same output digest `0x15d98143c9a17f64` with zero mismatches, unwritten outputs, or guard writes, and RTL printed `KT DONE`. The RTL kernel interval was 2,194 target cycles. These are functional RTL results, not a FireSim FPGA bitstream or physical ASIC result.
+
+## FireSim build in a managed worktree
+
+The Iris FireSim gitlink is `e1bdea8bb042b900995436ecc3d7c44100eb9da0`. Its sbt-ghpages docs plugin invokes JGit status on the task manager's `.git` file and throws `NoWorkTreeException` while assembling MIDAS. Apply the exact build-only diff from validated local FireSim commit `0bf1e8ebc71c8f9bf65f14e16fd29aea9967c63a` to an editable task-managed FireSim sibling before Golden Gate:
+
+```sh
+./patches/kodiak-vme/apply-firesim-worktree-build.sh /path/to/task/firesim
+```
+
+The patch SHA-256 is `36a72ab105a650af30c456a3a8478da2765bac7bc3a5248e2e6e4279b0ceec77`. It only removes docs publishing plugin wiring in `sim/build.sbt` and `sim/project/plugins.sbt`; it does not change target or MIDAS logic. Keep the Chipyard FireSim gitlink at the public Iris pin. With this patch, Golden Gate U250 `verilog`, Verilator metasim build, and a 35×63×33 biased K-tail ELF run passed. FireSim metasim reported the same digest `0x15d98143c9a17f64`, zero mismatches and guard failures, and `KT DONE` (2,761 kernel target cycles); a SHA-bound receipt is in the managed task. Vivado bitstream generation and FPGA execution are separate gates.
