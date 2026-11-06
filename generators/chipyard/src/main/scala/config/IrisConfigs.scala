@@ -101,16 +101,14 @@ object IrisNoCParams {
 }
 
 /** Tacit trace encoder and trace sinks. */
-class WithIrisTacitTrace
-    extends Config(
-      // One DMA sink per tile with a port on each bus, chosen by its bus_select
-      // register (soft-reset the DMA before changing it):
-      //   0 (reset): FBUS -> SBUS, reaches the SBUS scratchpad, or DRAM through the L2
-      //   1:         MBUS -> DRAM below the L2 (bypasses it)
-      new tacit.WithTraceSinkDMA(1, buses = Some(Seq(FBUS, MBUS))) ++        new tacit.WithTraceSinkAlways(0) ++
-        // new chipyard.WithTacitTraceArbiterMonitor ++
-        new chipyard.WithTacitParallelEncoder
-    )
+// merlin rtl-sim: the Tacit trace fragment does not compile at b4542fa
+// (chipyard.WithTacitParallelEncoder is defined nowhere; tacit's chipyard glue
+// needs a traceParams field the pinned Shuttle tile lacks), so the trace
+// encoder and its sinks are left out. Nothing else in IrisConfig changes.
+class WithIrisTacitTrace extends Config(Parameters.empty)
+
+/** IrisConfig without the Tacit trace encoder/sinks (see above). */
+class IrisNoTraceConfig extends Config(new IrisConfig)
 
 /** Widens the SBUS to 256b and drops the per-bus error devices. Sits on top of
   * the chip-specific WithSbusNoC.
