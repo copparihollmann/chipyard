@@ -1,0 +1,43 @@
+{
+  "schema": "kodiak.zvt_vme.compact_u250_synthesis.v1",
+  "stage": "post_synthesis_pre_implementation",
+  "verdict": "SYNTHESIS_PASS; PLACEMENT_ROUTE_TIMING_BITSTREAM_PENDING",
+  "target": "FireSimKodiakVMECompact1CoreConfig-BaseXilinxAlveoU250Config",
+  "board": "Alveo U250",
+  "frequency_mhz": 75,
+  "strategy": "AREA",
+  "tool": "Vivado 2023.1 build 3865809",
+  "source_pins": {
+    "chipyard_build_commit": "bef4698f396c1767915ad1f04e66269e9e6265f0",
+    "saturn": "4359c36b710bb230335fc2866a28bd3f1911ed6e",
+    "rocket_public_gitlink": "fc745a8c377fdbf1d278eea81da9ac47b4b5fbc0",
+    "rocket_managed_guard": "259c3a7072dc6d0ca32af603574e8352715759c9",
+    "firesim_managed": "0bf1e8ebc71c8f9bf65f14e16fd29aea9967c63a"
+  },
+  "inputs_sha256": {
+    "staged_goldengate_sv": "0ab40f836240132661145a8d525ef5c28cc8b4402e26a6198bc5a7e25f905a18",
+    "validated_k33_elf": "44352e47f2d82debeb971354a1b41295552a7cfe05539d5808da323998a5d948",
+    "metasim_receipt": "2d4fe1a9bffda3467e5ec0f39fa94571eec13844e87c1e21751f29b1976f9fc7",
+    "direct_rtl_receipt": "37a6ccbd5a638f2acb972b53404e2fbe2da7e77dc1c1a136786fd9294abe4a18",
+    "build_script": "93e4e2b2a3d0aa0b8c255b2dd7d1b68689a57534ffda54216f247b359cfe7678"
+  },
+  "report": {
+    "path": "patches/kodiak-vme/evidence/compact-u250-synth-utilization.rpt",
+    "sha256": "22aab1a933cfaf97140da1ce4c374bf1bf953c625e76cbbaf2c3746a2d76c14f",
+    "stage": "Vivado synth_1 report_utilization",
+    "clb_luts_used": 1267125,
+    "clb_luts_available": 1728000,
+    "clb_luts_percent": 73.33,
+    "lut_as_logic": 1217540,
+    "clb_registers": 1351065,
+    "bram_tiles": 134,
+    "dsps": 901
+  },
+  "prior_full_vme": {
+    "stage": "place_design DRC UTLZ-1",
+    "clb_luts_required": 2208803,
+    "clb_luts_available": 1728000,
+    "bitstream": false
+  },
+  "limitations": "A post-synthesis resource estimate does not prove placement, routing, timing closure, bitstream generation, or FPGA execution. This is a distinct Zvt VME target; the existing Kodiak ASIC/OPU bitstream uses BME."
+}
