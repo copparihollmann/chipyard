@@ -278,6 +278,15 @@ lazy val chipyard = {
       }.filter(_.exists)
   )
 
+  // Isolate this pinned dual-Shuttle build from unrelated incompatible examples.
+  cy = cy.settings(
+    Compile / unmanagedSources ~= { files =>
+      files.filterNot { f =>
+        Set("IrisConfigs.scala", "ChipletConfigs.scala").contains(f.getName) ||
+          f.getCanonicalPath.contains("/generators/tacit/chipyard/")
+      }
+    }
+  )
   cy
 }
 
