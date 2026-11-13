@@ -8,3 +8,10 @@ class FireSimVMEV256D128DualShuttleConfig extends Config(
   new WithFireSimConfigTweaks ++
   new chipyard.VMEV256D128DualShuttleConfig
 )
+
+class FireSimVMEV256D128DualShuttleMxConfig extends Config(
+  new freechips.rocketchip.subsystem.WithExtMemSize(1L << 34) ++
+  new WithDefaultFireSimBridges ++
+  new WithFireSimConfigTweaks ++
+  new chipyard.VMEV256D128DualShuttleMxConfig
+)
